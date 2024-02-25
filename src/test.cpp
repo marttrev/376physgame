@@ -6,6 +6,7 @@
 #include "LEAGUE/engine.h"
 #include "LEAGUE/physics.h"
 #include "ball.h"
+#include "car.h"
 
 int main(int argc, char** argv){
 	int opt;
@@ -14,7 +15,7 @@ int main(int argc, char** argv){
 	}
 	Scene scene;
 	Engine* engine = Engine::getInstance();
-	PhysicsWorld physics(b2Vec2(0.0, -10.0f));
+	PhysicsWorld physics(b2Vec2(0.0, 0.0));
 
 	b2BodyDef groundDef;
 	groundDef.position.Set(0.0f, -7.6f);
@@ -41,11 +42,18 @@ int main(int argc, char** argv){
 	rightBox.SetAsBox(1.0f, 50.0f);
 	right->CreateFixture(&rightBox, 1.0f);
 
-	for(int i=0; i<500; ++i){
+	/* for(int i=0; i<500; ++i){
 		Ball* b = new Ball(&physics);
 		scene.addUpdateable(*b);
 		scene.addDrawable(*b);
 	}
+ */
+	Car* redCar = new Car(&physics, true);
+	Car* greenCar = new Car(&physics, false);
+	scene.addUpdateable(*redCar);
+	scene.addUpdateable(*greenCar);
+	scene.addDrawable(*redCar);
+	scene.addDrawable(*greenCar);
 
 	scene.addUpdateable(physics);
 	engine->core_loop(scene);
