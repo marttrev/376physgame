@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 
 
 	b2BodyDef leftDef;
-	leftDef.position.Set(0.0f, -7.6f);
+	leftDef.position.Set(-0.2f, -7.6f);
 	leftDef.type=b2_staticBody;
 	b2Body* left = physics.addBody(&leftDef);
 	b2PolygonShape leftBox;
@@ -35,12 +35,20 @@ int main(int argc, char** argv){
 	left->CreateFixture(&leftBox, 1.0f);
 
 	b2BodyDef rightDef;
-	rightDef.position.Set(10.0f, -7.6f);
+	rightDef.position.Set(10.2f, -7.6f);
 	rightDef.type=b2_staticBody;
 	b2Body* right = physics.addBody(&rightDef);
 	b2PolygonShape rightBox;
 	rightBox.SetAsBox(1.0f, 50.0f);
 	right->CreateFixture(&rightBox, 1.0f);
+
+	b2BodyDef ceilDef;
+	ceilDef.position.Set(0.0f, 0.0f);
+	ceilDef.type=b2_staticBody;
+	b2Body* ceil = physics.addBody(&ceilDef);
+	b2PolygonShape ceilBox;
+	ceilBox.SetAsBox(50.0f, 1.0f);
+	ceil->CreateFixture(&ceilBox, 1.0f);
 
 	/* for(int i=0; i<500; ++i){
 		Ball* b = new Ball(&physics);
