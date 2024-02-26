@@ -15,11 +15,12 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distribution(0, 10);
 
-	this->isRed = isRed;
+    Car::isRed = isRed;
+    Car::accel = 0;
 
-	// Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
+    // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
     if (isRed) {
-		loadImage("./assets/redcar.png");
+        loadImage("./assets/redcar.png");
     } else {
         loadImage("./assets/greencar.png");
     }
@@ -27,18 +28,20 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     // Need a body definition before we can make a body
     bodyDef = new b2BodyDef();
     bodyDef->type = b2_dynamicBody;
-	if (isRed) {
-		// Red player will start on the left.
-		bodyDef->position.Set(0, -3.9f);
-	} else {
-		bodyDef->position.Set(8.25f, -3.9f);
-	}
+    if (isRed) {
+        // Red player will start on the left.
+        bodyDef->position.Set(0, -3.9f);
+    } else {
+        bodyDef->position.Set(8.25f, -3.9f);
+    }
+	bodyDef->linearDamping = 0.3f;
+	bodyDef->angularDamping = 0.3f;
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
     // Need a shape
     b2PolygonShape carShape;
-	/* Each of these is half the width/height, /100 for meters, then lowered slightly 
-	 * for a more generous hitbox. */
+    /* Each of these is half the width/height, /100 for meters, then lowered slightly
+     * for a more generous hitbox. */
     carShape.SetAsBox(0.30f, 0.11f);
     // Must apply a fixture.  Fixes shape and other properties to it.
     b2FixtureDef carFixture;
@@ -64,16 +67,38 @@ b2BodyDef* Car::getBodyDef() {
 
 void Car::update(double delta) {
     // std::cout << body->GetPosition().x << ", " << body->GetPosition().y << std::endl;
+    b2Vec2 currentVelocity = body->GetLinearVelocity();
     auto events = Engine::getEvents();
+	if (events.empty()) {
+		accel = 0;
+	}
     for (auto event = events.begin(); event != events.end(); ++event) {
         if (event->type == SDL_KEYDOWN) {
-            if (event->key.keysym.sym == SDLK_SPACE) {
+            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
+				// Thanks to this example I found online for this code: https://github.com/RonakFabian/Asteroids-SFML-Box2D/blob/main/Asteroids/Rocket.cpp
+                float X = 1 * sin(body->GetAngle());
+				float Y = 1 * -cos(body->GetAngle());
+				body->ApplyForceToCenter(b2Vec2(X, Y), true);
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
+				body->ApplyForceToCenter({-1,0}, true);
+			} else {
+				accel = 0;
+			}
+
+            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
+				body->ApplyTorque(-ROTATE, true);
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
+				body->ApplyTorque(ROTATE, true);
+			}
+
+			// Original code.
+            /* if (event->key.keysym.sym == SDLK_SPACE) {
                 b2Vec2 up(0.0f, 1.0f);
                 b2Vec2 pos = body->GetPosition();
                 pos.x += 0.1;
                 body->ApplyLinearImpulse(up, pos, true);
                 body->ApplyTorque(10.0f, true);
-            }
+            } */
         }
     }
 }
