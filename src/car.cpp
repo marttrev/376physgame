@@ -79,6 +79,7 @@ void Car::update(double delta) {
                 float X = 1 * sin(body->GetAngle());
 				float Y = 1 * -cos(body->GetAngle());
 				body->ApplyForceToCenter(b2Vec2(X, Y), true);
+                //std::cout << X << " " << Y << std::endl;
             } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
 				body->ApplyForceToCenter({-1,0}, true);
 			} else {
@@ -86,7 +87,9 @@ void Car::update(double delta) {
 			}
 
             if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
-				body->ApplyTorque(-ROTATE, true);
+				//We want to utilize the SetTransform() function, and pass the same position but update the angle in radians
+                //ApplyTorque isn't the function we want to be using
+                body->ApplyTorque(-ROTATE, true);
             } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
 				body->ApplyTorque(ROTATE, true);
 			}
