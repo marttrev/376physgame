@@ -7,7 +7,7 @@
 
 class Wall : public Drawable{//only drawable because it is a static body
 	public:
-		Wall(PhysicsWorld*, float, float, float, float);
+		Wall(const char*, PhysicsWorld*, float, float, float, float);
 		~Wall();
 		void draw(SDL_Renderer* renderer) override;
 		float flip(float);
@@ -15,8 +15,8 @@ class Wall : public Drawable{//only drawable because it is a static body
 		b2BodyDef* getBodyDef();
 		b2Body* getBody();
 	private:
-		int x_vel;
-		int y_vel;
+		float halfHeight;
+		float halfWidth;
 		b2Body* body;
 		b2BodyDef* bodyDef;
 };
