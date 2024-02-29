@@ -11,13 +11,14 @@
 #include "LEAGUE/physics.h"
 #include "mathfu/vector.h"
 
+const int MAGNITUDE = 100;
+
 Car::Car(PhysicsWorld* physics, bool isRed) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distribution(0, 10);
 
     Car::isRed = isRed;
-    Car::accel = 0;
 
     // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
     if (isRed) {
@@ -36,7 +37,7 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
         bodyDef->position.Set(8.25f, -3.9f);
     }
     bodyDef->linearDamping = 0.3f;
-    bodyDef->angularDamping = 0.3f;
+    bodyDef->angularDamping = 0.5f;
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
     // Need a shape
@@ -70,43 +71,30 @@ void Car::update(double delta) {
     // std::cout << body->GetPosition().x << ", " << body->GetPosition().y << std::endl;
     b2Vec2 currentVelocity = body->GetLinearVelocity();
     auto events = Engine::getEvents();
-    if (events.empty()) {
-        accel = 0;
-    }
     for (auto event = events.begin(); event != events.end(); ++event) {
         if (event->type == SDL_KEYDOWN) {
             if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
-                /* Mod by 360 just to make things more readable. Don't think it's needed. Mod by floats is an invalid operation,
-                 * hence why we use the fmod function instead. */
-                float angle = fmod(body->GetAngle(), 360);
-                // Convert to usable values
-
-                if (angle > 0) {
-                    // Clockwise angles should go backwards from 360 but are positive.
-                    angle = 360 - angle;
-                } else {
-                    // Counter-clockwise angles should be positive but are negative.
-                    angle *= -1;
-                }
-
-                /* Thanks to this example I found online for this code: https://github.com/RonakFabian/Asteroids-SFML-Box2D/blob/main/Asteroids/Rocket.cpp
-                 * Note the multiply, need to convert to radians from degrees because that's what sin/cos operate on. */
-                float X = 1 * cos(angle * (180/M_PI));
-                float Y = 1 * sin(angle * (180/M_PI));
+                float angle = convertAngle(body->GetAngle());
+                /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+                 * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+                float X = (MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+                float Y = (MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
                 body->ApplyForceToCenter(b2Vec2(X, Y), true);
-                // std::cout << X << " " << Y << std::endl;
             } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
-                body->ApplyForceToCenter({-1, 0}, true);
-            } else {
-                accel = 0;
+                float angle = convertAngle(body->GetAngle());
+                /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+                 * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+                float X = (MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+                float Y = (MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+                body->ApplyForceToCenter(-b2Vec2(X, Y), true);
             }
 
             if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
                 // We want to utilize the SetTransform() function, and pass the same position but update the angle in radians
                 // ApplyTorque isn't the function we want to be using
-                body->ApplyTorque(-ROTATE, true);
+                body->ApplyAngularImpulse(-MAGNITUDE/100 * delta, true);
             } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
-                body->ApplyTorque(ROTATE, true);
+                body->ApplyAngularImpulse(MAGNITUDE/100 * delta, true);
             }
 
             if (event->key.keysym.sym == SDLK_i) {
@@ -118,19 +106,14 @@ void Car::update(double delta) {
                     // Counter-clockwise angles should be positive but are negative.
                     angle *= -1;
                 }
-                std::cout << "Angle: " << angle << std::endl;
-                std::cout << "Vector: <" << (1 * cos(angle * (180/M_PI))) << ", " << (1 * sin(angle * (180/M_PI))) << ">" << std::endl
-                          << std::endl;
-            }
 
-            // Original code.
-            /* if (event->key.keysym.sym == SDLK_SPACE) {
-                b2Vec2 up(0.0f, 1.0f);
-                b2Vec2 pos = body->GetPosition();
-                pos.x += 0.1;
-                body->ApplyLinearImpulse(up, pos, true);
-                body->ApplyTorque(10.0f, true);
-            } */
+                float posX = body->GetPosition().x;
+                float posY = body->GetPosition().y;
+                std::cout << "Angle: " << angle << std::endl;
+                std::cout << "Vector: <" << (100 * delta * cos(angle * (180 / M_PI))) << ", " << (100 * delta * sin(angle * (180 / M_PI))) << ">" << std::endl
+                          << std::endl;
+                std::cout << "Position: " << posX << ", " << posY << std::endl;
+            }
         }
     }
 }
@@ -152,4 +135,21 @@ void Car::draw(SDL_Renderer* renderer) {
 
 b2Body* Car::getBody() {
     return body;
+}
+
+float Car::convertAngle(float initAngle) {
+    /* Mod by 360 just to make things more readable. Don't think it's needed. Mod by floats is an invalid operation,
+     * hence why we use the fmod function instead. */
+    float angle = fmod(initAngle, 360);
+
+    // Convert to usable values
+    if (angle > 0) {
+        // Clockwise angles should go backwards from 360 but are positive.
+        angle = 360 - angle;
+    } else {
+        // Counter-clockwise angles should be positive but are negative.
+        angle *= -1;
+    }
+
+    return angle;
 }

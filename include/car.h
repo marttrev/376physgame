@@ -5,8 +5,6 @@
 #include "LEAGUE/physics.h"
 #include <box2d/box2d.h>
 
-const int ROTATE = 1;
-
 class Car : public Drawable, public Updateable {
 	public:
 		Car(PhysicsWorld*, bool);
@@ -20,7 +18,7 @@ class Car : public Drawable, public Updateable {
 	private:
 		int x_vel;
 		int y_vel;
-		float accel;
+		float convertAngle(float initAngle);
 		bool isRed;
 		b2Body* body;
 		b2BodyDef* bodyDef;
