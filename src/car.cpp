@@ -138,38 +138,25 @@ float Car::convertAngle(float initAngle) {
 }
 
 void Car::processInputs() {
-    auto events = Engine::getEvents();
-    for (auto event = events.begin(); event != events.end(); ++event) {
-        if (event->type == SDL_KEYDOWN) {
-            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
-                Car::isUp = true;
-                // Don't want both up/down at the same time.
-                Car::isDown = false;
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
-                Car::isDown = true;
-                Car::isUp = false;
-            }
+    int numkeys = 0;
+    SDL_PumpEvents();
+    const Uint8* keystate = SDL_GetKeyboardState(&numkeys);
 
-            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
-                Car::isLeft = true;
-                // Don't want both left/right at the same time.
-                Car::isRight = false;
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
-                Car::isRight = true;
-                Car::isLeft = false;
-            }
-        } else if (event->type == SDL_KEYUP) {
-            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
-                Car::isUp = false;
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
-                Car::isDown = false;
-            }
+    // continuous-response keys
+    Car::isUp = (Car::isRed && keystate[SDL_SCANCODE_W]) || ((!Car::isRed) && keystate[SDL_SCANCODE_UP]);
+    Car::isDown = (Car::isRed && keystate[SDL_SCANCODE_S]) || ((!Car::isRed) && keystate[SDL_SCANCODE_DOWN]);
+    Car::isLeft = (Car::isRed && keystate[SDL_SCANCODE_A]) || ((!Car::isRed) && keystate[SDL_SCANCODE_LEFT]);
+    Car::isRight = (Car::isRed && keystate[SDL_SCANCODE_D]) || ((!Car::isRed) && keystate[SDL_SCANCODE_RIGHT]);
 
-            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
-                Car::isLeft = false;
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
-                Car::isRight = false;
-            }
-        }
+    // if both up and down are pressed, neither should be true
+    if(Car::isUp && Car::isDown){
+        Car::isUp = false;
+        Car::isDown = false;
+    }
+
+    // similar for left/right
+    if(Car::isLeft && Car::isRight){
+        Car::isLeft = false;
+        Car::isRight = false;
     }
 }
