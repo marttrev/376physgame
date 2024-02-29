@@ -37,7 +37,7 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     bodyDef->type = b2_dynamicBody;
     if (isRed) {
         // Red player will start on the left.
-        bodyDef->position.Set(0, -3.9f);
+        bodyDef->position.Set(1, -3.9f);
     } else {
         bodyDef->position.Set(8.25f, -3.9f);
     }
@@ -45,6 +45,10 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     bodyDef->angularDamping = 0.5f;
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
+    if (!isRed) {
+        // Docs say the angle should be in radians. It wants degrees. Stupid but whatever.
+        body->SetTransform(body->GetPosition(), 180);
+    }
     // Need a shape
     b2PolygonShape carShape;
     /* Each of these is half the width/height, /100 for meters, then lowered slightly
@@ -91,8 +95,6 @@ void Car::update(double delta) {
     }
 
     if (Car::isLeft) {
-        // We want to utilize the SetTransform() function, and pass the same position but update the angle in radians
-        // ApplyTorque isn't the function we want to be using
         body->ApplyAngularImpulse(-TORQUE_MAGNITUDE / 100 * delta, true);
     } else if (Car::isRight) {
         body->ApplyAngularImpulse(TORQUE_MAGNITUDE / 100 * delta, true);
