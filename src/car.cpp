@@ -59,7 +59,7 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     carFixture.shape = &carShape;
     carFixture.density = 1.0f;
     carFixture.friction = 0.9f;
-    carFixture.restitution = 0.6f;
+    carFixture.restitution = 0.0f;
     // Make the fixture.
     body->CreateFixture(&carFixture);
 }
@@ -95,9 +95,9 @@ void Car::update(double delta) {
     }
 
     if (Car::isLeft) {
-        body->ApplyAngularImpulse(-TORQUE_MAGNITUDE / 100 * delta, true);
+        body->ApplyTorque(-TORQUE_MAGNITUDE * delta, true);
     } else if (Car::isRight) {
-        body->ApplyAngularImpulse(TORQUE_MAGNITUDE / 100 * delta, true);
+        body->ApplyTorque(TORQUE_MAGNITUDE * delta, true);
     }
 }
 
