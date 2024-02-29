@@ -18,7 +18,7 @@ int main(int argc, char** argv){
 	PhysicsWorld physics(b2Vec2(0.0, 0.0));
 
 	b2BodyDef groundDef;
-	groundDef.position.Set(0.0f, -7.6f);
+	groundDef.position.Set(0.0f, -8.2f);
 	groundDef.type=b2_staticBody;
 	b2Body* ground = physics.addBody(&groundDef);
 	b2PolygonShape groundBox;
@@ -27,7 +27,7 @@ int main(int argc, char** argv){
 
 
 	b2BodyDef leftDef;
-	leftDef.position.Set(-0.2f, -7.6f);
+	leftDef.position.Set(-1.5f, -7.6f);
 	leftDef.type=b2_staticBody;
 	b2Body* left = physics.addBody(&leftDef);
 	b2PolygonShape leftBox;
@@ -35,7 +35,7 @@ int main(int argc, char** argv){
 	left->CreateFixture(&leftBox, 1.0f);
 
 	b2BodyDef rightDef;
-	rightDef.position.Set(10.2f, -7.6f);
+	rightDef.position.Set(10.6f, -7.6f);
 	rightDef.type=b2_staticBody;
 	b2Body* right = physics.addBody(&rightDef);
 	b2PolygonShape rightBox;
@@ -43,7 +43,7 @@ int main(int argc, char** argv){
 	right->CreateFixture(&rightBox, 1.0f);
 
 	b2BodyDef ceilDef;
-	ceilDef.position.Set(0.0f, 0.0f);
+	ceilDef.position.Set(0.0f, 0.8f);
 	ceilDef.type=b2_staticBody;
 	b2Body* ceil = physics.addBody(&ceilDef);
 	b2PolygonShape ceilBox;
