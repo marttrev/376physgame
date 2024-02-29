@@ -16,12 +16,18 @@ class Car : public Drawable, public Updateable {
 		b2BodyDef* getBodyDef();
 		b2Body* getBody();
 	private:
+		
 		int x_vel;
 		int y_vel;
-		float convertAngle(float initAngle);
 		bool isRed;
+		bool isUp;
+		bool isDown;
+		bool isLeft;
+		bool isRight;
 		b2Body* body;
 		b2BodyDef* bodyDef;
+		void processInputs();
+		float convertAngle(float initAngle);
 };
 
 #endif

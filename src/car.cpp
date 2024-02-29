@@ -11,7 +11,8 @@
 #include "LEAGUE/physics.h"
 #include "mathfu/vector.h"
 
-const int MAGNITUDE = 100;
+const int ACCEL_MAGNITUDE = 25;
+const int TORQUE_MAGNITUDE = 100;
 
 Car::Car(PhysicsWorld* physics, bool isRed) {
     std::random_device rd;
@@ -19,6 +20,10 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     std::uniform_int_distribution<int> distribution(0, 10);
 
     Car::isRed = isRed;
+    Car::isUp = false;
+    Car::isDown = false;
+    Car::isLeft = false;
+    Car::isRight = false;
 
     // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
     if (isRed) {
@@ -68,53 +73,29 @@ b2BodyDef* Car::getBodyDef() {
 }
 
 void Car::update(double delta) {
-    // std::cout << body->GetPosition().x << ", " << body->GetPosition().y << std::endl;
-    b2Vec2 currentVelocity = body->GetLinearVelocity();
-    auto events = Engine::getEvents();
-    for (auto event = events.begin(); event != events.end(); ++event) {
-        if (event->type == SDL_KEYDOWN) {
-            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
-                float angle = convertAngle(body->GetAngle());
-                /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
-                 * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
-                float X = (MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
-                float Y = (MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
-                body->ApplyForceToCenter(b2Vec2(X, Y), true);
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
-                float angle = convertAngle(body->GetAngle());
-                /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
-                 * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
-                float X = (MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
-                float Y = (MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
-                body->ApplyForceToCenter(-b2Vec2(X, Y), true);
-            }
+    Car::processInputs();
+    if (Car::isUp) {
+        float angle = convertAngle(body->GetAngle());
+        /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+         * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+        float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+        float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+        body->ApplyForceToCenter(b2Vec2(X, Y), true);
+    } else if (Car::isDown) {
+        float angle = convertAngle(body->GetAngle());
+        /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+         * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+        float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+        float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+        body->ApplyForceToCenter(-b2Vec2(X, Y), true);
+    }
 
-            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
-                // We want to utilize the SetTransform() function, and pass the same position but update the angle in radians
-                // ApplyTorque isn't the function we want to be using
-                body->ApplyAngularImpulse(-MAGNITUDE/100 * delta, true);
-            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
-                body->ApplyAngularImpulse(MAGNITUDE/100 * delta, true);
-            }
-
-            if (event->key.keysym.sym == SDLK_i) {
-                float angle = fmod(body->GetAngle(), 360);
-                if (angle > 0) {
-                    // Clockwise angles should go backwards from 360 but are positive.
-                    angle = 360 - angle;
-                } else {
-                    // Counter-clockwise angles should be positive but are negative.
-                    angle *= -1;
-                }
-
-                float posX = body->GetPosition().x;
-                float posY = body->GetPosition().y;
-                std::cout << "Angle: " << angle << std::endl;
-                std::cout << "Vector: <" << (100 * delta * cos(angle * (180 / M_PI))) << ", " << (100 * delta * sin(angle * (180 / M_PI))) << ">" << std::endl
-                          << std::endl;
-                std::cout << "Position: " << posX << ", " << posY << std::endl;
-            }
-        }
+    if (Car::isLeft) {
+        // We want to utilize the SetTransform() function, and pass the same position but update the angle in radians
+        // ApplyTorque isn't the function we want to be using
+        body->ApplyAngularImpulse(-TORQUE_MAGNITUDE / 100 * delta, true);
+    } else if (Car::isRight) {
+        body->ApplyAngularImpulse(TORQUE_MAGNITUDE / 100 * delta, true);
     }
 }
 
@@ -152,4 +133,41 @@ float Car::convertAngle(float initAngle) {
     }
 
     return angle;
+}
+
+void Car::processInputs() {
+    auto events = Engine::getEvents();
+    for (auto event = events.begin(); event != events.end(); ++event) {
+        if (event->type == SDL_KEYDOWN) {
+            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
+                Car::isUp = true;
+                // Don't want both up/down at the same time.
+                Car::isDown = false;
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
+                Car::isDown = true;
+                Car::isUp = false;
+            }
+
+            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
+                Car::isLeft = true;
+                // Don't want both left/right at the same time.
+                Car::isRight = false;
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
+                Car::isRight = true;
+                Car::isLeft = false;
+            }
+        } else if (event->type == SDL_KEYUP) {
+            if ((Car::isRed && event->key.keysym.sym == SDLK_w) || ((!Car::isRed) && event->key.keysym.sym == SDLK_UP)) {
+                Car::isUp = false;
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_s) || ((!Car::isRed) && event->key.keysym.sym == SDLK_DOWN)) {
+                Car::isDown = false;
+            }
+
+            if ((Car::isRed && event->key.keysym.sym == SDLK_a) || ((!Car::isRed) && event->key.keysym.sym == SDLK_LEFT)) {
+                Car::isLeft = false;
+            } else if ((Car::isRed && event->key.keysym.sym == SDLK_d) || ((!Car::isRed) && event->key.keysym.sym == SDLK_RIGHT)) {
+                Car::isRight = false;
+            }
+        }
+    }
 }
