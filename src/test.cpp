@@ -7,6 +7,8 @@
 #include "LEAGUE/physics.h"
 #include "ball.h"
 #include "car.h"
+#include "wall.h"
+#include "caution_wall.h"
 
 int main(int argc, char** argv){
 	int opt;
@@ -17,53 +19,28 @@ int main(int argc, char** argv){
 	Engine* engine = Engine::getInstance();
 	PhysicsWorld physics(b2Vec2(0.0, 0.0));
 
-	b2BodyDef groundDef;
-	groundDef.position.Set(0.0f, -8.2f);
-	groundDef.type=b2_staticBody;
-	b2Body* ground = physics.addBody(&groundDef);
-	b2PolygonShape groundBox;
-	groundBox.SetAsBox(50.0f, 1.0f);
-	ground->CreateFixture(&groundBox, 1.0f);
-
-
-	b2BodyDef leftDef;
-	leftDef.position.Set(-1.5f, -7.6f);
-	leftDef.type=b2_staticBody;
-	b2Body* left = physics.addBody(&leftDef);
-	b2PolygonShape leftBox;
-	leftBox.SetAsBox(1.0f, 50.0f);
-	left->CreateFixture(&leftBox, 1.0f);
-
-	b2BodyDef rightDef;
-	rightDef.position.Set(10.6f, -7.6f);
-	rightDef.type=b2_staticBody;
-	b2Body* right = physics.addBody(&rightDef);
-	b2PolygonShape rightBox;
-	rightBox.SetAsBox(1.0f, 50.0f);
-	right->CreateFixture(&rightBox, 1.0f);
-
-	b2BodyDef ceilDef;
-	ceilDef.position.Set(0.0f, 0.8f);
-	ceilDef.type=b2_staticBody;
-	b2Body* ceil = physics.addBody(&ceilDef);
-	b2PolygonShape ceilBox;
-	ceilBox.SetAsBox(50.0f, 1.0f);
-	ceil->CreateFixture(&ceilBox, 1.0f);
-
-	/* for(int i=0; i<500; ++i){
-		Ball* b = new Ball(&physics);
-		scene.addUpdateable(*b);
-		scene.addDrawable(*b);
-	}
- */
 	Car* redCar = new Car(&physics, true);
 	Car* greenCar = new Car(&physics, false);
-	scene.addUpdateable(*redCar);
-	scene.addUpdateable(*greenCar);
-	scene.addDrawable(*redCar);
-	scene.addDrawable(*greenCar);
+
+	Wall* topWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, 0.2f);
+	Wall* bottomWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, -7.4f);
+	Wall* leftWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, -0.5f, -3.84f);
+	Wall* rightWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, 9.7f, -3.84f);
+
+	CautionWall* leftCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 4.0f, -4.0f);
 
 	scene.addUpdateable(physics);
+	scene.addUpdateable(*redCar);
+	scene.addUpdateable(*greenCar);
+	
+	scene.addDrawable(*redCar);
+	scene.addDrawable(*greenCar);
+	scene.addDrawable(*topWall);
+	scene.addDrawable(*bottomWall);
+	scene.addDrawable(*leftWall);
+	scene.addDrawable(*rightWall);
+	scene.addDrawable(*leftCaution);
+
 	engine->core_loop(scene);
 	engine->shutdown();
 }
