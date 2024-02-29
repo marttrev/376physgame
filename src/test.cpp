@@ -56,11 +56,11 @@ int main(int argc, char** argv){
 		scene.addDrawable(*b);
 	}
  */
-	Car* redCar = new Car(&physics, true);
+	//Car* redCar = new Car(&physics, true);
 	Car* greenCar = new Car(&physics, false);
-	scene.addUpdateable(*redCar);
+	//scene.addUpdateable(*redCar);
 	scene.addUpdateable(*greenCar);
-	scene.addDrawable(*redCar);
+	//scene.addDrawable(*redCar);
 	scene.addDrawable(*greenCar);
 
 	scene.addUpdateable(physics);
