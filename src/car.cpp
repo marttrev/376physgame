@@ -12,8 +12,8 @@
 #include "mathfu/vector.h"
 #include "user_data.h"
 
-const int ACCEL_MAGNITUDE = 25;
-const int TORQUE_MAGNITUDE = 100;
+const int ACCEL_MAGNITUDE = 15;
+const int TORQUE_MAGNITUDE = 70;
 
 Car::Car(PhysicsWorld* physics, bool isRed) {
     std::random_device rd;
@@ -45,8 +45,8 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     } else {
         bodyDef->position.Set(8.25f, -3.9f);
     }
-    bodyDef->linearDamping = 0.3f;
-    bodyDef->angularDamping = 0.5f;
+    bodyDef->linearDamping = 0.6f;
+    bodyDef->angularDamping = 1.0f;
     // To detect collision
     bodyDef->userData.pointer = reinterpret_cast<uintptr_t>(&userData);
     // Physics engine makes the body for us and returns a pointer to it
@@ -65,7 +65,7 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     carFixture.shape = &carShape;
     carFixture.density = 1.0f;
     carFixture.friction = 0.9f;
-    carFixture.restitution = 0.0f;
+    carFixture.restitution = 0.5f;
     // Make the fixture.
     body->CreateFixture(&carFixture);
 }
