@@ -6,11 +6,13 @@
 PhysicsWorld::PhysicsWorld(b2Vec2 gravity) : world(gravity){
 	this->gravity = gravity;
 	std::cout << "Gravity: " << world.GetGravity().x << ", " << world.GetGravity().y << std::endl;
+	// Add in listener to ensure that collisions are acted on.
 	listener = new GameListener();
 	world.SetContactListener(listener);
 }
 
 PhysicsWorld::~PhysicsWorld() {
+	// Because we're now allocating memory, need this.
 	delete listener;
 }
 

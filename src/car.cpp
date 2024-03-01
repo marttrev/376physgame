@@ -20,13 +20,15 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distribution(0, 10);
 
+    // Initialize values.
     Car::isRed = isRed;
+    // These will be used for tracking inputs.
     Car::isUp = false;
     Car::isDown = false;
     Car::isLeft = false;
     Car::isRight = false;
 
-    // Set 5hp.
+    // Set 5hp. This time it matters.
     Car::userData = {false, 5};
 
     // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
@@ -45,9 +47,10 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     } else {
         bodyDef->position.Set(8.25f, -3.9f);
     }
+    // Since we're doing top-down, *this* is really what simulates friction.
     bodyDef->linearDamping = 0.6f;
     bodyDef->angularDamping = 1.0f;
-    // To detect collision
+    // To detect collision, this will get pulled out by our listener.
     bodyDef->userData.pointer = reinterpret_cast<uintptr_t>(&userData);
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
@@ -86,18 +89,22 @@ void Car::update(double delta) {
     if (userData.hp > 0) {
         Car::processInputs();
         if (Car::isUp) {
+            // Get the angle the car is facing.
             float angle = convertAngle(body->GetAngle());
             /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
              * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
             float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
             float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+            // Move forward.
             body->ApplyForceToCenter(b2Vec2(X, Y), true);
         } else if (Car::isDown) {
+            // Get the angle the car is facing.
             float angle = convertAngle(body->GetAngle());
             /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
              * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
             float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
             float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+            // Negating the vector so we move backward.
             body->ApplyForceToCenter(-b2Vec2(X, Y), true);
         }
 
@@ -112,6 +119,7 @@ void Car::update(double delta) {
         if (!isRed) {
             body->SetTransform(body->GetPosition(), 0);
         }
+        // So we're not constantly loading in the image, decrement again.
         userData.hp--;
     }
 }

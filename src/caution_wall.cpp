@@ -14,7 +14,7 @@ CautionWall::CautionWall(const char* path, PhysicsWorld* physics, float halfWidt
     CautionWall::halfHeight = halfHeight * 100;
     CautionWall::halfWidth = halfWidth * 100;
 
-    // For collision
+    // These walls are *just walls,* so they are non-damaging. Arbitrary hp value.
     CautionWall::userData = {false, 0};
 
     // Need a body definition before we can make a body
@@ -27,7 +27,7 @@ CautionWall::CautionWall(const char* path, PhysicsWorld* physics, float halfWidt
     body = physics->addBody(bodyDef);
     // Need a shape
     b2PolygonShape wallShape;
-    wallShape.SetAsBox(halfWidth, halfHeight);  // need to divide width and height by 2
+    wallShape.SetAsBox(halfWidth, halfHeight); 
     // Must apply a fixture.  Fixes shape and other properties to it.
     b2FixtureDef wallFixture;
     wallFixture.shape = &wallShape;
@@ -54,8 +54,9 @@ b2BodyDef* CautionWall::getBodyDef() {
 void CautionWall::draw(SDL_Renderer* renderer) {
     SDL_Rect dest;
     b2Vec2 pos = body->GetPosition();
-    /* I have no idea why this scales like this but it does so we're doing this I guess. Optimized for 100x768
-	 * and 1024x100 pixel walls, no clue if this will work with other sizes because I've not tried yet. */
+    /* Despite my best efforts, these do not draw appropriately to the hitbox, so there's some *weird* scaling
+     * going on here to try and dial it in. If this doesn't make sense to you, don't worry, it doesn't make sense
+     * to me either, I just brute-forced these numbers. */
     if (CautionWall::halfHeight > CautionWall::halfWidth) {
 		// Vertical scaling.
 		dest.x = pos.x * 100 + CautionWall::halfWidth;

@@ -7,9 +7,7 @@ Road::Road() {
 }
 
 void Road::draw(SDL_Renderer* renderer) {
-/*     rect.w = 768;
-    rect.h = 1024; */
-    // std::cout << dest.x << ", " << dest.y << std::endl;
+    // Just draw to the whole screen since this is just a background.
     int result = SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_NONE);
     if (result != 0) {
         std::cout << SDL_GetError() << std::endl;
