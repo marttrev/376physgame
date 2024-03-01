@@ -9,6 +9,7 @@
 #include "car.h"
 #include "wall.h"
 #include "caution_wall.h"
+#include "road.h"
 
 int main(int argc, char** argv){
 	int opt;
@@ -18,6 +19,8 @@ int main(int argc, char** argv){
 	Scene scene;
 	Engine* engine = Engine::getInstance();
 	PhysicsWorld physics(b2Vec2(0.0, 0.0));
+
+	Road* road = new Road();
 
 	Car* redCar = new Car(&physics, true);
 	Car* greenCar = new Car(&physics, false);
@@ -41,6 +44,7 @@ int main(int argc, char** argv){
 	scene.addUpdateable(*redCar);
 	scene.addUpdateable(*greenCar);
 	
+	scene.addDrawable(*road);
 	scene.addDrawable(*redCar);
 	scene.addDrawable(*greenCar);
 	scene.addDrawable(*topWall);
