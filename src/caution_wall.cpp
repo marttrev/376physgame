@@ -54,11 +54,11 @@ void CautionWall::draw(SDL_Renderer* renderer) {
     if (CautionWall::halfHeight > CautionWall::halfWidth) {
 		// Vertical scaling.
 		dest.x = pos.x * 100 + CautionWall::halfWidth;
-		dest.y = (pos.y * -1 * 100) - CautionWall::halfHeight;
+		dest.y = (pos.y * -1 * 100) - (CautionWall::halfHeight - 15);
     } else {
         // Horizontal scaling.
-		dest.x = (pos.x * 100) - CautionWall::halfWidth;
-        dest.y = (pos.y * -1 * 100) - CautionWall::halfHeight;
+		dest.x = (pos.x * 100) - 35;
+        dest.y = (pos.y * -1 * 100) + 5;
     }
     dest.w = rect.w;
     dest.h = rect.h;
