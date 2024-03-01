@@ -37,7 +37,7 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     bodyDef->type = b2_dynamicBody;
     if (isRed) {
         // Red player will start on the left.
-        bodyDef->position.Set(1, -3.9f);
+        bodyDef->position.Set(1.25, -3.9f);
     } else {
         bodyDef->position.Set(8.25f, -3.9f);
     }
