@@ -27,7 +27,15 @@ int main(int argc, char** argv){
 	Wall* leftWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, -0.5f, -3.84f);
 	Wall* rightWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, 9.7f, -3.84f);
 
-	CautionWall* leftCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 4.0f, -4.0f);
+	CautionWall* leftCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 2.9f, -3.8f);
+	CautionWall* rightCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 6.8f, -3.8f);
+	CautionWall* topLeftCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 2.0f, -1.5f);
+	CautionWall* topCenterCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 4.8f, -1.5f);
+	CautionWall* topRightCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 7.6f, -1.5f);
+	CautionWall* bottomLeftCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 2.0f, -6.0f);
+	CautionWall* bottomCenterCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 4.8f, -6.0f);
+	CautionWall* bottomRightCaution = new CautionWall("./assets/150x30wall.png", &physics, 0.75f, 0.15f, 7.6f, -6.0f);
+
 
 	scene.addUpdateable(physics);
 	scene.addUpdateable(*redCar);
@@ -40,6 +48,13 @@ int main(int argc, char** argv){
 	scene.addDrawable(*leftWall);
 	scene.addDrawable(*rightWall);
 	scene.addDrawable(*leftCaution);
+	scene.addDrawable(*rightCaution);
+	scene.addDrawable(*topLeftCaution);
+	scene.addDrawable(*topCenterCaution);
+	scene.addDrawable(*topRightCaution);
+	scene.addDrawable(*bottomLeftCaution);
+	scene.addDrawable(*bottomCenterCaution);
+	scene.addDrawable(*bottomRightCaution);
 
 	engine->core_loop(scene);
 	engine->shutdown();
