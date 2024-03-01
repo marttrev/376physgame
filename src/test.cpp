@@ -27,8 +27,8 @@ int main(int argc, char** argv){
 
 	Wall* topWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, 0.2f);
 	Wall* bottomWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, -7.4f);
-	Wall* leftWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, -0.5f, -3.84f);
-	Wall* rightWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, 9.7f, -3.84f);
+	Wall* leftWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, -0.4f, -3.84f);
+	Wall* rightWall = new Wall("./assets/100x768spikes.png", &physics, 0.5f, 3.84f, 9.8f, -3.84f);
 
 	CautionWall* leftCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 2.9f, -3.8f);
 	CautionWall* rightCaution = new CautionWall("./assets/30x150wall.png", &physics, 0.15f, 0.75f, 6.8f, -3.8f);

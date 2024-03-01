@@ -59,7 +59,7 @@ void Wall::draw(SDL_Renderer* renderer) {
 	 * and 1024x100 pixel walls, no clue if this will work with other sizes because I've not tried yet. */
     if (Wall::halfHeight > Wall::halfWidth) {
 		// Vertical scaling.
-		dest.x = pos.x * 100;
+		dest.x = (pos.x * 100) - 10;
 		dest.y = (pos.y * -1 * 100) - Wall::halfHeight;
     } else {
         // Horizontal scaling.
