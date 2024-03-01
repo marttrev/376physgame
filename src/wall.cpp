@@ -1,4 +1,5 @@
 #include "wall.h"
+#include "user_data.h"
 
 #include <box2d/box2d.h>
 
@@ -14,10 +15,15 @@ Wall::Wall(const char* path, PhysicsWorld* physics, float halfWidth, float halfH
     Wall::halfHeight = halfHeight * 100;
     Wall::halfWidth = halfWidth * 100;
 
+    // For collision
+    Wall::userData = {true, 0};
+
     // Need a body definition before we can make a body
     bodyDef = new b2BodyDef();
     bodyDef->type = b2_staticBody;  // define the wall as a static body
     bodyDef->position.Set(centerX, centerY);
+    // To detect collision
+    bodyDef->userData.pointer = reinterpret_cast<uintptr_t>(&userData);
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
     // Need a shape

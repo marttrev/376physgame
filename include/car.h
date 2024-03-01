@@ -3,20 +3,22 @@
 
 #include "LEAGUE/common_data_structures.h"
 #include "LEAGUE/physics.h"
+#include "user_data.h"
 #include <box2d/box2d.h>
 
 class Car : public Drawable, public Updateable {
 	public:
 		Car(PhysicsWorld*, bool);
 		~Car();
+		struct UserData userData;
 		void draw(SDL_Renderer* renderer) override;
 		void update(double delta) override;
 		float flip(float);
 		void setBody(b2Body*);
 		b2BodyDef* getBodyDef();
 		b2Body* getBody();
-	private:
-		
+	
+	private:		
 		int x_vel;
 		int y_vel;
 		bool isRed;

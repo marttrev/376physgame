@@ -10,6 +10,7 @@
 #include "LEAGUE/engine.h"
 #include "LEAGUE/physics.h"
 #include "mathfu/vector.h"
+#include "user_data.h"
 
 const int ACCEL_MAGNITUDE = 25;
 const int TORQUE_MAGNITUDE = 100;
@@ -24,6 +25,9 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     Car::isDown = false;
     Car::isLeft = false;
     Car::isRight = false;
+
+    // Set 5hp.
+    Car::userData = {false, 5};
 
     // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
     if (isRed) {
@@ -43,6 +47,8 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     }
     bodyDef->linearDamping = 0.3f;
     bodyDef->angularDamping = 0.5f;
+    // To detect collision
+    bodyDef->userData.pointer = reinterpret_cast<uintptr_t>(&userData);
     // Physics engine makes the body for us and returns a pointer to it
     body = physics->addBody(bodyDef);
     if (!isRed) {
@@ -77,27 +83,36 @@ b2BodyDef* Car::getBodyDef() {
 }
 
 void Car::update(double delta) {
-    Car::processInputs();
-    if (Car::isUp) {
-        float angle = convertAngle(body->GetAngle());
-        /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
-         * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
-        float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
-        float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
-        body->ApplyForceToCenter(b2Vec2(X, Y), true);
-    } else if (Car::isDown) {
-        float angle = convertAngle(body->GetAngle());
-        /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
-         * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
-        float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
-        float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
-        body->ApplyForceToCenter(-b2Vec2(X, Y), true);
-    }
+    if (userData.hp > 0) {
+        Car::processInputs();
+        if (Car::isUp) {
+            float angle = convertAngle(body->GetAngle());
+            /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+             * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+            float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+            float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+            body->ApplyForceToCenter(b2Vec2(X, Y), true);
+        } else if (Car::isDown) {
+            float angle = convertAngle(body->GetAngle());
+            /* Get the vector from the (arbitrary) magnitude and current facing angle. I'd forgotten how to do this. Sourced from here:
+             * https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:vectors/x9e81a4f98389efdf:component-form/v/vector-components-from-magnitude-and-direction */
+            float X = (ACCEL_MAGNITUDE * delta) * std::cos(angle * (M_PI / 180));
+            float Y = (ACCEL_MAGNITUDE * delta) * std::sin(angle * (M_PI / 180));
+            body->ApplyForceToCenter(-b2Vec2(X, Y), true);
+        }
 
-    if (Car::isLeft) {
-        body->ApplyTorque(-TORQUE_MAGNITUDE * delta, true);
-    } else if (Car::isRight) {
-        body->ApplyTorque(TORQUE_MAGNITUDE * delta, true);
+        if (Car::isLeft) {
+            body->ApplyTorque(-TORQUE_MAGNITUDE * delta, true);
+        } else if (Car::isRight) {
+            body->ApplyTorque(TORQUE_MAGNITUDE * delta, true);
+        }
+    } else if (userData.hp == 0) {
+        loadImage("./assets/gravestone.png");
+        // Flip the gravestone upright.
+        if (!isRed) {
+            body->SetTransform(body->GetPosition(), 0);
+        }
+        userData.hp--;
     }
 }
 
@@ -149,13 +164,13 @@ void Car::processInputs() {
     Car::isRight = (Car::isRed && keystate[SDL_SCANCODE_D]) || ((!Car::isRed) && keystate[SDL_SCANCODE_RIGHT]);
 
     // if both up and down are pressed, neither should be true
-    if(Car::isUp && Car::isDown){
+    if (Car::isUp && Car::isDown) {
         Car::isUp = false;
         Car::isDown = false;
     }
 
     // similar for left/right
-    if(Car::isLeft && Car::isRight){
+    if (Car::isLeft && Car::isRight) {
         Car::isLeft = false;
         Car::isRight = false;
     }
