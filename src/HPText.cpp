@@ -12,34 +12,43 @@
 HPText::HPText(Car* car, SDL_Color textColor, int x, int y) {
     HPText::car = car;
     HPText::textColor = textColor;
-    HPText::font = TTF_OpenFont("arial.ttf", 12);
     HPText::x = x;
-    HPText::x = y;
+    HPText::y = y;
+    HPText::font = TTF_OpenFont("./assets/OpenSans-Regular.ttf", 50);
+    if(HPText::font == NULL){
+        std::cout << "Could not load font: " << TTF_GetError() << std::endl;
+    }
 }
 
 HPText::~HPText(){
     TTF_CloseFont(HPText::font);
 }
 
+// inspired by https://stackoverflow.com/questions/22886500/how-to-render-text-in-sdl2/38169008#38169008
+// however, it's been heavily modified
 void HPText::draw(SDL_Renderer* renderer){
+    const char* text = std::to_string(HPText::car->getUserData().hp).append("/5").c_str();
+
     SDL_Surface* surface;
-    surface = TTF_RenderText_Solid(HPText::font, "" + HPText::car->userData.hp, HPText::textColor);
+    surface = TTF_RenderText_Solid(HPText::font, text, HPText::textColor);
+    if(surface == NULL){
+        std::cout << "Font not found: " << TTF_GetError() << std::endl;
+        // return;
+    }
     
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    
-    int text_width = surface->w;
-    int text_height = surface->h;
-    
+    if(texture == NULL){
+        std::cout << "error: " << SDL_GetError() << std::endl;
+        // return;
+    }
     SDL_FreeSurface(surface);
     
-
     SDL_Rect dest;
     dest.x = HPText::x;
     dest.y = HPText::y;
-    dest.w = text_width;
-    dest.h = text_height;
-    // std::cout << dest.x << ", " << dest.y << std::endl;
-    int result = SDL_RenderCopyEx(renderer, texture, NULL, &dest, 0.0f, NULL, SDL_FLIP_NONE);
+    TTF_SizeUTF8(HPText::font, text, &dest.w, &dest.h);
+
+    int result = SDL_RenderCopy(renderer, texture, NULL, &dest);
     if (result != 0) {
         std::cout << SDL_GetError() << std::endl;
     }

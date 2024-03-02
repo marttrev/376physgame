@@ -26,8 +26,8 @@ int main(int argc, char** argv){
 	Car* redCar = new Car(&physics, true);
 	Car* greenCar = new Car(&physics, false);
 
-	HPText* redHP = new HPText(redCar, {255, 0, 0}, 20, 20);
-	HPText* greenHP = new HPText(greenCar, {0, 255, 0}, 500, 20);
+	HPText* redHP = new HPText(redCar, {255, 0, 0}, 50, 20);
+	HPText* greenHP = new HPText(greenCar, {0, 255, 0}, 900, 20);
 
 	Wall* topWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, 0.2f);
 	Wall* bottomWall = new Wall("./assets/1024x100spikes.png", &physics, 5.12f, 0.5f, 5.12f, -7.4f);

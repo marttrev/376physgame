@@ -14,6 +14,7 @@ extern "C" {
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 // Setup default values for our static vars.
 Engine* Engine::instance{nullptr};
@@ -71,6 +72,10 @@ bool Engine::setup(){
 	if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
 		SDL_Log("Cannot initialize image library: %s", SDL_GetError());
 		return false;
+	}
+
+	if(TTF_Init() == -1){
+		std::cout << "Cannot initialize TTF: " << TTF_GetError() << std::endl;
 	}
 
 	window = SDL_CreateWindow(GAME_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -193,6 +198,7 @@ void Engine::shutdown(){
 	lua_close(Engine::L);
 	SDL_DestroyWindow(window);
 	SDL_DestroyRenderer(renderer);
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }

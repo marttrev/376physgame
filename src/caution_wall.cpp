@@ -15,7 +15,7 @@ CautionWall::CautionWall(const char* path, PhysicsWorld* physics, float halfWidt
     CautionWall::halfWidth = halfWidth * 100;
 
     // These walls are *just walls,* so they are non-damaging. Arbitrary hp value.
-    CautionWall::userData = {false, 0};
+    CautionWall::userData = {false, false, 0};
 
     // Need a body definition before we can make a body
     bodyDef = new b2BodyDef();

@@ -12,9 +12,10 @@ void GameListener::BeginContact(b2Contact *contact) {
     struct UserData* secondUData = reinterpret_cast<UserData*>(secondBody->GetUserData().pointer);
 
     // If something touches a damaging object (the spikes), reduce that object's HP.
-    if (firstUData->isDamaging) {
+    if (firstUData->isDamaging && secondUData->takesDamage) {
         secondUData->hp--;
-    } else if (secondUData->isDamaging) {
+    }
+    if (secondUData->isDamaging && firstUData->takesDamage) {
         firstUData->hp--;
     }
 }

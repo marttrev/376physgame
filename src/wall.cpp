@@ -16,7 +16,7 @@ Wall::Wall(const char* path, PhysicsWorld* physics, float halfWidth, float halfH
     Wall::halfWidth = halfWidth * 100;
 
     // For collision, says that this *is* a damaging object and sets an arbitrary (unused) hp value.
-    Wall::userData = {true, 0};
+    Wall::userData = {true, false, 0};
 
     // Need a body definition before we can make a body
     bodyDef = new b2BodyDef();

@@ -3,6 +3,7 @@
 
 struct UserData {
     bool isDamaging;
+    bool takesDamage;
     int hp;
 };
 

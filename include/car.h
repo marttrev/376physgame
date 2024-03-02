@@ -10,15 +10,16 @@ class Car : public Drawable, public Updateable {
 	public:
 		Car(PhysicsWorld*, bool);
 		~Car();
-		struct UserData userData;
 		void draw(SDL_Renderer* renderer) override;
 		void update(double delta) override;
+		UserData getUserData();
 		float flip(float);
 		void setBody(b2Body*);
 		b2BodyDef* getBodyDef();
 		b2Body* getBody();
 	
-	private:		
+	private:
+		struct UserData userData;		
 		int x_vel;
 		int y_vel;
 		bool isRed;
@@ -26,6 +27,7 @@ class Car : public Drawable, public Updateable {
 		bool isDown;
 		bool isLeft;
 		bool isRight;
+		bool isAlive;
 		b2Body* body;
 		b2BodyDef* bodyDef;
 		void processInputs();

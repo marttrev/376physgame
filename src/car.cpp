@@ -27,9 +27,10 @@ Car::Car(PhysicsWorld* physics, bool isRed) {
     Car::isDown = false;
     Car::isLeft = false;
     Car::isRight = false;
+    Car::isAlive = true;
 
     // Set 5hp. This time it matters.
-    Car::userData = {false, 5};
+    Car::userData = {false, true, 5};
 
     // Image is 76x38, where Box2D expects 100px=1m. Probably make the hitbox slightly smaller.
     if (isRed) {
@@ -113,14 +114,15 @@ void Car::update(double delta) {
         } else if (Car::isRight) {
             body->ApplyTorque(TORQUE_MAGNITUDE * delta, true);
         }
-    } else if (userData.hp == 0) {
+    } else if (userData.hp <= 0 && Car::isAlive) {
         loadImage("./assets/gravestone.png");
         // Flip the gravestone upright.
-        if (!isRed) {
-            body->SetTransform(body->GetPosition(), 0);
-        }
-        // So we're not constantly loading in the image, decrement again.
-        userData.hp--;
+        body->SetTransform(body->GetPosition(), 0);
+        
+        // set alive to false and hp to 0 (in case it somehow became negative)
+        Car::isAlive = false;
+        userData.takesDamage = false;
+        userData.hp = 0;
     }
 }
 
@@ -141,6 +143,10 @@ void Car::draw(SDL_Renderer* renderer) {
 
 b2Body* Car::getBody() {
     return body;
+}
+
+UserData Car::getUserData(){
+    return this->userData;
 }
 
 float Car::convertAngle(float initAngle) {
